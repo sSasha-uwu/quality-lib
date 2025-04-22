@@ -25,7 +25,7 @@ quality_lib.add(
 
 The values within the final table are the values for each level of quality. Notably, quality level four does not exist in vanilla Factorio, but if you have a mod that adds that quality, this will handle that just fine.
 
-This will create a set of entities and items with the following names:
+This will create a set of entities and items with the following names that will be automatically swapped in-game based on the quality level of the original item, allowing for as seamless of an experience as possible.
 
 ```lua
 "sSasha__betterquality__common-storage-tank"
