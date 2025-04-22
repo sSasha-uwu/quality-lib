@@ -1,13 +1,13 @@
 # Quality Lib
 Provides a library for modders to easily interface with Quality and add quality stats to any item/entity.
 
-Adding an item yourself is easy. First, import the mod in the file you wish to use:
+Adding an item yourself is easy. First, import the mod in the data stage, ideally the `data.lua` file.
 
 ```lua
 local quality_lib = require('__quality-lib__.module')
 ```
 
-Then use the `add` method to add your items to the library. Do this in the data stage, ideally the `data.lua` file.
+Then use the `add` method to add your items to the library.
 
 ```lua
 quality_lib.add(
