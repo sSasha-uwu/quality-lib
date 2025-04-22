@@ -37,4 +37,4 @@ This will create a set of entities and items with the following names that will 
 
 The library currently only supports hardcoded values for quality levels, but I am planning on adding support for additive/multiplicative multipliers as well as constantly increasing values.
 
-For more, see my Better Quality (https://github.com/sSasha-uwu/better-quality) mod which uses this library to make a number of quality entities and items.
+For more, see my Better Quality mod (https://github.com/sSasha-uwu/better-quality) which uses this library to make a number of quality entities and items.
