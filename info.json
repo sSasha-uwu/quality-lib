@@ -1,0 +1,14 @@
+{
+    "name": "quality-lib",
+    "version": "1.0.0",
+    "title": "Quality Lib",
+    "author": "sSasha",
+    "factorio_version": "2.0",
+    "dependencies": [
+        "base >= 2.0.2",
+        "quality >= 2.0.2",
+        "? space-age >= 2.0.2",
+        "? aai-loaders >= 0.2.5"
+    ],
+    "description": "Provides a library for modders to easily interface with Quality and add quality stats to any item/entity."
+}
