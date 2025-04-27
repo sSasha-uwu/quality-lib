@@ -105,7 +105,6 @@ local function generate_quality_prototypes(
     for quality_name, quality_value in pairs(qualities) do
         if quality_value.level > 0 then
             local prefix = common.mod_prefix .. quality_name .. "-"
-            log(prefix .. prototype_name)
 
             local new_items = {}
 
@@ -130,13 +129,17 @@ local function generate_quality_prototypes(
                 new_entity.related_underground_belt = common.mod_prefix .. quality_name .. "-" .. new_entity.related_underground_belt
             end
             new_entity = alter_stats(new_entity, prototype_value, quality_value)
+            table.insert(new_prototypes, new_entity)
 
-            for item_name in new_items do
+            for _, item_name in pairs(new_items) do
                 local new_item = nil
                 for item_prototype, _ in pairs(data.raw) do
-                    if item_prototype:startswith("item") and data.raw[item_prototype][item_name] then
-                        new_item = table.deepcopy(data.raw[item_prototype][item_name])
-                        goto next
+                    if common.startswith(item_prototype, "item") then
+                        local original_item = string.sub(item_name, #prefix + 1, -1)
+                        if data.raw[item_prototype][original_item] then
+                            new_item = table.deepcopy(data.raw[item_prototype][original_item])
+                            goto next
+                        end
                     end
                 end
                 ::next::

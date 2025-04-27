@@ -6,7 +6,7 @@ if not _G.quality_lib_changes then
     _G.quality_lib_changes = {}
     if prototypes then
         for entity_name, entity_value in pairs(prototypes.entity) do
-            if entity_name:startswith(common.mod_prefix) then
+            if common.startswith(entity_name, common.mod_prefix) then
                 local entity_prototype = entity_value.type
                 local original_entity_name = entity_name:match("^[^%-]+%-[^%-]+%-(.+)$")
                 log(entity_name .. " " .. entity_prototype)

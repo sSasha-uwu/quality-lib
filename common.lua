@@ -25,7 +25,7 @@ function common.has_modules(entity)
     return true
 end
 
-function string.startswith(String,Start)
+function common.startswith(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
 
