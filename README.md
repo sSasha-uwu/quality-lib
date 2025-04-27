@@ -76,6 +76,8 @@ quality_lib.add(
 )
 ```
 
+This will increase the stat by 8 for each level.
+
     Uncommon:  48
     Rare:      56
     Epic:      64
@@ -97,13 +99,15 @@ quality_lib.add(
 )
 ```
 
-    Uncommon:  48
-    Rare:      56
-    Epic:      64
-    Quality 4: 72
-    Legendary: 80
-    Quality 6: 88
-    Quality 7: 96
+This will increase the multiplier by 0.2x each level, starting at 1.0x
+
+    Uncommon:  48 (1.2x)
+    Rare:      56 (1.4x)
+    Epic:      64 (1.6x)
+    Quality 4: 72 (1.8x)
+    Legendary: 80 (2.0x)
+    Quality 6: 88 (2.2x)
+    Quality 7: 96 (2.4x)
     etc...
 
 ```lua
@@ -118,6 +122,8 @@ quality_lib.add(
 )
 ```
 
+This will multiply every level by the given multiplier, thus resulting in an exponential increase.
+
     Uncommon:  48
     Rare:      57.6
     Epic:      69.12
@@ -127,11 +133,11 @@ quality_lib.add(
     Quality 7: 143.327232
     etc...
 
-As you can see, the stat value continues to increase faster and faster as the Quality level rises.
-
 ## @all Special Key
 
-Instead of having to specify Quality stat values for every single variant of of an entity, you can instead use the `["@all"]` special key as the `PROTOTYPE_NAME` key. This will iterate through all prototypes within the parent prototype and apply your quality changes to each of them.
+Instead of having to specify Quality stat values for every single variant of of an entity, you can instead use the `["@all"]` special key as the `PROTOTYPE_NAME` key. This will iterate through all prototypes within the parent prototype and apply your quality changes to each of them, including modded prototypes..
+
+You can use this key within a prototype type instead of having to specify every single individual prototype yourself. This will also cover modded prototypes for you.
 
 Example using Transport Belts:
 
@@ -147,6 +153,6 @@ quality_lib.add(
 )
 ```
 
-This will apply Quality scaling to all Transport Belts in the game (Including modded!!), resulting in all Transport Belts having twice their speed at Legendary.
+This will apply Quality scaling to all Transport Belts in the game, resulting in all Transport Belts having twice their speed at Legendary.
 
 For more, see my Better Quality mod (https://github.com/sSasha-uwu/better-quality) which uses this library to make a number of quality entities and items.

@@ -75,13 +75,12 @@ local function generate_quality_prototypes(
     local new_prototypes = {}
     for quality_name, quality_value in pairs(qualities) do
         if quality_value.level > 0 then
-            local internal_name = common.mod_prefix .. quality_name .. "-" .. prototype_name
-            log(internal_name)
-
+            local prefix = common.mod_prefix .. quality_name .. "-"
             local new_item = table.deepcopy(data.raw["item"][prototype_name]) or table.deepcopy(data.raw["item-with-entity-data"][prototype_name])
             if new_item then
-                new_item.name = internal_name
-                new_item.place_result = internal_name
+                log("item")
+                new_item.name = prefix .. new_item.name
+                new_item.place_result = prefix .. new_item.place_result
                 new_item.subgroup = nil
                 table.insert(new_prototypes, new_item)
             end
@@ -89,12 +88,12 @@ local function generate_quality_prototypes(
             local new_entity = table.deepcopy(data.raw[parent_name][prototype_name])
             new_entity.localised_name = {"entity-name." .. new_entity.name}
             new_entity.localised_description = {"entity-description." .. new_entity.name}
-            new_entity.name = internal_name
+            new_entity.name = prefix .. new_entity.name
             if new_entity.placeable_by then
-                new_entity.placeable_by.item = internal_name
+                new_entity.placeable_by.item = prefix .. new_entity.placeable_by.item
             end
             if new_entity.minable then
-                new_entity.minable.result = internal_name
+                new_entity.minable.result = prefix .. new_entity.minable.result
             end
             if new_entity.related_underground_belt then
                 new_entity.related_underground_belt = common.mod_prefix .. quality_name .. "-" .. new_entity.related_underground_belt
@@ -157,3 +156,34 @@ end
 if next(prototype_table) then
     data:extend(prototype_table)
 end
+
+function serializeTable(val, name, skipnewlines, depth)
+    skipnewlines = skipnewlines or false
+    depth = depth or 0
+
+    local tmp = string.rep(" ", depth)
+
+    if name then tmp = tmp .. name .. " = " end
+
+    if type(val) == "table" then
+        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
+
+        for k, v in pairs(val) do
+            tmp =  tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+        end
+
+        tmp = tmp .. string.rep(" ", depth) .. "}"
+    elseif type(val) == "number" then
+        tmp = tmp .. tostring(val)
+    elseif type(val) == "string" then
+        tmp = tmp .. string.format("%q", val)
+    elseif type(val) == "boolean" then
+        tmp = tmp .. (val and "true" or "false")
+    else
+        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+    end
+
+    return tmp
+end
+
+log(serializeTable(data.raw["storage-tank"]))

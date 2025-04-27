@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+  Bugfixes:
+    - Fix for entities that do not have matching items.
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
   Major Features:
     - Updated the API to support delta values in Quality scaling. Supports additive constants, additive multipliers, and multiplicative multipliers. See the readme for more information.
