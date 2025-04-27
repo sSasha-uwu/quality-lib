@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.2
+  Bugfixes:
+    - Reworked the item generation code to support weird entities that make my brain hurt.
+---------------------------------------------------------------------------------------------------
 Version: 2.0.1
   Bugfixes:
     - Fix for entities that do not have matching items.
