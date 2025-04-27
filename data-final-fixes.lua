@@ -1,48 +1,159 @@
 local common = require("__quality-lib__.common")
 local quality_lib = require('__quality-lib__.module')
 
-local qualities = table.deepcopy(data.raw["quality"])
+local success, response
 
-local new_entities = {}
-local new_items = {}
+local function get_qualities()
 
-for prototype_name, prototype_value in pairs(quality_lib.get_changes()) do
-    for entity_name, entity_value in pairs(prototype_value) do
-        for quality_name, quality_value in pairs(qualities) do
-            if quality_value.level > 0 then
-                local new_entity = table.deepcopy(data.raw[prototype_name][entity_name])
-                new_entity.localised_name = {"entity-name." .. new_entity.name}
-                new_entity.localised_description = {"entity-description." .. new_entity.name}
-                new_entity.hidden = false
-                new_entity.name = common.mod_prefix .. quality_name .. "-" .. new_entity.name
-                new_entity.placeable_by = {item=new_entity.name, count=1, quality=quality_value}
-                new_entity.minable["result"] = new_entity.name
-                if prototype_name == "transport-belt" then
-                    new_entity.related_underground_belt = common.mod_prefix .. quality_name .. "-" .. new_entity.related_underground_belt
+    local qualities = table.deepcopy(data.raw["quality"])
+
+    local quality_array = {}
+    for k, v in pairs(qualities) do
+        table.insert(quality_array, {key = k, value = v})
+    end
+
+    table.sort(quality_array, function(a, b)
+        return a.value.level < b.value.level
+    end)
+
+    local sorted_qualities = {}
+    for _, item in ipairs(quality_array) do
+        sorted_qualities[item.key] = item.value
+    end
+
+    return sorted_qualities
+end
+
+---@param parent_table table
+---@param prototype_value table
+---@param quality_value table
+---@return table
+local function alter_stats(parent_table, prototype_value, quality_value)
+    for stat_key, stat_value in pairs(prototype_value) do
+        local energy_unit
+        local original_stat = parent_table[stat_key]
+        if type(original_stat) == "string" then
+            original_stat, energy_unit = common.split_power_string(original_stat)
+        end
+        if common.is_dictionary(stat_value) then
+            alter_stats(original_stat, stat_value, quality_value)
+        else
+            if stat_value.delta_constant then
+                stat_value = original_stat + (stat_value.delta_constant * quality_value.level)
+            elseif stat_value.delta_additive then
+                stat_value = original_stat * (1 + (stat_value.delta_additive * quality_value.level))
+            elseif stat_value.delta_multiplicative then
+                stat_value = original_stat * (stat_value.delta_multiplicative ^ quality_value.level)
+            else
+                if stat_value[quality_value.level] then
+                    stat_value = stat_value[quality_value.level]
+                else
+                    stat_value = stat_value[#stat_value]
                 end
-                for stat_name, stat_value in pairs(entity_value) do
-                    if common.is_dictionary(stat_value) then
-                        for stat_table_name, stat_table_value in pairs(stat_value) do
-                            new_entity[stat_name][stat_table_name] = stat_table_value[quality_value.level]
-                        end
-                    else
-                        new_entity[stat_name] = stat_value[quality_value.level]
-                    end
-                end
-                table.insert(new_entities, new_entity)
-                local new_item = table.deepcopy(data.raw["item"][entity_name]) or table.deepcopy(data.raw["item-with-entity-data"][entity_name])
-                new_item.name = common.mod_prefix .. quality_name .. "-" .. new_item.name
-                new_item.place_result = new_entity.name
-                new_item.subgroup = nil
-                table.insert(new_items, new_item)
+            end
+            if energy_unit then
+                parent_table[stat_key] = tostring(stat_value) .. energy_unit
+            else
+                parent_table[stat_key] = stat_value
             end
         end
     end
+    return parent_table
 end
 
-if next(new_entities) then
-    data.extend(new_entities)
+---@param qualities table
+---@param parent_name string
+---@param prototype_name string
+---@param prototype_value table
+---@return table
+local function generate_quality_prototypes(
+    qualities,
+    parent_name,
+    prototype_name,
+    prototype_value
+)
+    local new_prototypes = {}
+    for quality_name, quality_value in pairs(qualities) do
+        if quality_value.level > 0 then
+            local internal_name = common.mod_prefix .. quality_name .. "-" .. prototype_name
+            log(internal_name)
+
+            local new_item = table.deepcopy(data.raw["item"][prototype_name]) or table.deepcopy(data.raw["item-with-entity-data"][prototype_name])
+            if new_item then
+                new_item.name = internal_name
+                new_item.place_result = internal_name
+                new_item.subgroup = nil
+                table.insert(new_prototypes, new_item)
+            end
+
+            local new_entity = table.deepcopy(data.raw[parent_name][prototype_name])
+            new_entity.localised_name = {"entity-name." .. new_entity.name}
+            new_entity.localised_description = {"entity-description." .. new_entity.name}
+            new_entity.name = internal_name
+            if new_entity.placeable_by then
+                new_entity.placeable_by.item = internal_name
+            end
+            if new_entity.minable then
+                new_entity.minable.result = internal_name
+            end
+            if new_entity.related_underground_belt then
+                new_entity.related_underground_belt = common.mod_prefix .. quality_name .. "-" .. new_entity.related_underground_belt
+            end
+            new_entity = alter_stats(new_entity, prototype_value, quality_value)
+            table.insert(new_prototypes, new_entity)
+        end
+        ::continue::
+    end
+    return new_prototypes
 end
-if next(new_items) then
-    data.extend(new_items)
+
+local qualities = get_qualities()
+
+local prototype_table = {}
+
+for parent_name, parent_value in pairs(quality_lib.get_changes()) do
+    if parent_value["@all"] then
+        for data_prototype_name, _ in pairs(data.raw[parent_name]) do
+            success, response = pcall(
+                generate_quality_prototypes,
+                qualities,
+                parent_name,
+                data_prototype_name,
+                parent_value["@all"]
+            )
+            if not success and response then common.error_handler(
+                response,
+                "generate_quality_prototypes() Prototype: [@all-" .. parent_name .. "]-[" .. data_prototype_name .. "]")
+            else
+                local new_prototypes = response
+                for _, prototype in pairs(new_prototypes) do
+                    table.insert(prototype_table, prototype)
+                end
+            end
+        end
+        goto continue
+    end
+    for prototype_name, prototype_value in pairs(parent_value) do
+        success, response = pcall(
+        generate_quality_prototypes,
+        qualities,
+            parent_name,
+            prototype_name,
+            prototype_value
+        )
+        if not success and response then common.error_handler(
+            response,
+            "generate_quality_prototypes() Prototype: [" .. parent_name .. "]-[" .. prototype_name .. "]")
+        else
+            local new_prototypes = response
+            for _, prototype in pairs(new_prototypes) do
+                table.insert(prototype_table, prototype)
+            end
+        end
+    end
+    ::continue::
+end
+
+if next(prototype_table) then
+    data:extend(prototype_table)
 end

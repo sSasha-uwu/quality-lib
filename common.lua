@@ -29,4 +29,20 @@ function string.startswith(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
 
+function common.split_power_string(s)
+    local number, unit = s:match("^(%d+%.?%d*)(%a*%u)$")
+    if number and unit then
+        return tonumber(number), unit
+    else
+        return nil, nil
+    end
+end
+
+---@param err string
+---@param source string
+function common.error_handler(err, source)
+    log("[ERROR] An error occurred in " .. source .. "\n" .. err)
+end
+
+
 return common

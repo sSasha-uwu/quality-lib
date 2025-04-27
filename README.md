@@ -1,6 +1,8 @@
 # Quality Lib
 Provides a library for modders to easily interface with Quality and add quality stats to any item/entity.
 
+## Basics
+
 Adding an item yourself is easy. First, import the mod in the data stage, ideally the `data.lua` file.
 
 ```lua
@@ -48,6 +50,103 @@ This will create a set of entities and items with the following names that will 
 "sSasha__betterquality__legendary-storage-tank"
 ```
 
-The library currently only supports hardcoded values for quality levels, but I am planning on adding support for additive/multiplicative multipliers as well as constantly increasing values.
+## Delta Values
+
+Instead of hardcoding each Quality level yourself, it is much easier to set a delta value within the final table that will automatically increment itself for each Quality level. This  also means your mod will automatically adjust for higher levels of Quality if someone else adds a mod that adds them.
+
+There are three valid delta fields you can set, each one functioning slightly differently.
+
+`delta_constant` This field increments the stat value by a constant value each Quality level.
+
+`delta_additive` This field multiplies the base stat value by an increasing, additive multiplier each Quality level.
+
+`delta_multiplicative` This field multiplies each Quality level by a multiplier, thus increasing the stat exponentially.
+
+Example using a Cargo Wagon's inventory size (Base value = 40):
+
+```lua
+quality_lib.add(
+    {
+        ["cargo-wagon"]={
+            ["cargo-wagon"]={
+                ["inventory_size"]={delta_constant = 8}
+            }
+        }
+    }
+)
+```
+
+    Uncommon:  48
+    Rare:      56
+    Epic:      64
+    Quality 4: 72
+    Legendary: 80
+    Quality 6: 88
+    Quality 7: 96
+    etc...
+
+```lua
+quality_lib.add(
+    {
+        ["cargo-wagon"]={
+            ["cargo-wagon"]={
+                ["inventory_size"]={delta_additive = 0.2}
+            }
+        }
+    }
+)
+```
+
+    Uncommon:  48
+    Rare:      56
+    Epic:      64
+    Quality 4: 72
+    Legendary: 80
+    Quality 6: 88
+    Quality 7: 96
+    etc...
+
+```lua
+quality_lib.add(
+    {
+        ["cargo-wagon"]={
+            ["cargo-wagon"]={
+                ["inventory_size"]={delta_multiplicative = 1.2}
+            }
+        }
+    }
+)
+```
+
+    Uncommon:  48
+    Rare:      57.6
+    Epic:      69.12
+    Quality 4: 82.944
+    Legendary: 99.5328
+    Quality 6: 119.43936
+    Quality 7: 143.327232
+    etc...
+
+As you can see, the stat value continues to increase faster and faster as the Quality level rises.
+
+## @all Special Key
+
+Instead of having to specify Quality stat values for every single variant of of an entity, you can instead use the `["@all"]` special key as the `PROTOTYPE_NAME` key. This will iterate through all prototypes within the parent prototype and apply your quality changes to each of them.
+
+Example using Transport Belts:
+
+```lua
+quality_lib.add(
+    {
+        ["transport-belt"]={
+            ["@all"]={
+                ["speed"]={delta_additive = 1.2}
+            }
+        },
+    }
+)
+```
+
+This will apply Quality scaling to all Transport Belts in the game (Including modded!!), resulting in all Transport Belts having twice their speed at Legendary.
 
 For more, see my Better Quality mod (https://github.com/sSasha-uwu/better-quality) which uses this library to make a number of quality entities and items.

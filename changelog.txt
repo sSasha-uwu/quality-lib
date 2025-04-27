@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+  Major Features:
+    - Updated the API to support delta values in Quality scaling. Supports additive constants, additive multipliers, and multiplicative multipliers. See the readme for more information.
+  Bugfixes:
+    - No longer breaks if you have a Quality level that is higher than 5.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+  Major Features:
+    - Initial release.
