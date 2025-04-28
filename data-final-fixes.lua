@@ -114,15 +114,17 @@ local function generate_quality_prototypes(
             new_entity.name = prefix .. new_entity.name
             table.insert(new_items, new_entity.name)
             if new_entity.placeable_by then
-                new_entity.placeable_by.item = prefix .. new_entity.placeable_by.item
-                if new_entity.placeable_by.item ~= new_entity.name then
-                    table.insert(new_items, new_entity.placeable_by.item)
+                if prefix .. new_entity.placeable_by.item == new_entity.name then
+                    new_entity.placeable_by.item = prefix .. new_entity.placeable_by.item
+                else
+                    new_entity.placeable_by.item = new_entity.placeable_by.item
                 end
             end
             if new_entity.minable then
-                new_entity.minable.result = prefix .. new_entity.minable.result
-                if new_entity.minable.result ~= new_entity.name then
-                    table.insert(new_items, new_entity.minable.result)
+                if prefix .. new_entity.minable.result == new_entity.name then
+                    new_entity.minable.result = prefix .. new_entity.minable.result
+                else
+                    new_entity.minable.result = new_entity.minable.result
                 end
             end
             if new_entity.related_underground_belt then
@@ -131,24 +133,22 @@ local function generate_quality_prototypes(
             new_entity = alter_stats(new_entity, prototype_value, quality_value)
             table.insert(new_prototypes, new_entity)
 
-            for _, item_name in pairs(new_items) do
-                local new_item = nil
-                for item_prototype, _ in pairs(data.raw) do
-                    if common.startswith(item_prototype, "item") then
-                        local original_item = string.sub(item_name, #prefix + 1, -1)
-                        if data.raw[item_prototype][original_item] then
-                            new_item = table.deepcopy(data.raw[item_prototype][original_item])
-                            goto next
-                        end
+            local new_item = nil
+            for item_prototype, _ in pairs(data.raw) do
+                if common.startswith(item_prototype, "item") then
+                    local original_item = string.sub(item_name, #prefix + 1, -1)
+                    if data.raw[item_prototype][original_item] then
+                        new_item = table.deepcopy(data.raw[item_prototype][original_item])
+                        goto next
                     end
                 end
-                ::next::
-                if new_item then
-                    new_item.name = prefix .. new_item.name
-                    new_item.place_result = prefix .. new_item.place_result
-                    new_item.subgroup = nil
-                    table.insert(new_prototypes, new_item)
-                end
+            end
+            ::next::
+            if new_item then
+                new_item.name = prefix .. new_item.name
+                new_item.place_result = prefix .. new_item.place_result
+                new_item.subgroup = nil
+                table.insert(new_prototypes, new_item)
             end
         end
     end

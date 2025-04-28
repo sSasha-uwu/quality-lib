@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.3
+  Bugfixes:
+    - Reworked the item generation code again to support even weirder entities (help).
+---------------------------------------------------------------------------------------------------
 Version: 2.0.2
   Bugfixes:
     - Reworked the item generation code to support weird entities that make my brain hurt.
