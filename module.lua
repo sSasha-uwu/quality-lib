@@ -25,10 +25,15 @@ end
 
 function quality_lib.add(new)
     for k, v in pairs(new) do
-        if _G.quality_lib_changes[k] then
-            log("[WARNING ]Key: " .. k .. " is already present. Overwriting.")
+        if not _G.quality_lib_changes[k] then
+            _G.quality_lib_changes[k] = {}
         end
-        _G.quality_lib_changes[k] = v
+        for k2, v2 in pairs(v) do
+            if _G.quality_lib_changes[k][k2] then
+                log("[WARNING]Key: " .. k2 .. " is already present. Overwriting.")
+            end
+            _G.quality_lib_changes[k][k2] = v2
+        end
     end
 end
 

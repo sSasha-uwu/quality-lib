@@ -136,7 +136,7 @@ local function generate_quality_prototypes(
             local new_item = nil
             for item_prototype, _ in pairs(data.raw) do
                 if common.startswith(item_prototype, "item") then
-                    local original_item = string.sub(item_name, #prefix + 1, -1)
+                    local original_item = string.sub(new_entity.name, #prefix + 1, -1)
                     if data.raw[item_prototype][original_item] then
                         new_item = table.deepcopy(data.raw[item_prototype][original_item])
                         goto next
