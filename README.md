@@ -37,7 +37,7 @@ The structure expected for the add function is as follows:
 }
 ```
 
-You may have noticed that the structure is slightly different from the example. This is because the mod supports an extra level of field depth for stats that are nested. In the example, this allows you to edit the `volume` field within the `fluid_box` field without having to overwrite the entire `fluid_box` field with every quality step.
+You may have noticed that the structure is slightly different from the example. This is because the mod supports a infinite levels of field depth for stats that are nested. In the example, this allows you to edit the `volume` field within the `fluid_box` field without having to overwrite the entire `fluid_box` field with every quality step.
 
 The values within the final table are the values for each level of quality. Notably, quality level four does not exist in vanilla Factorio, but if you have a mod that adds that quality, this will handle that just fine.
 

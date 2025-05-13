@@ -1,4 +1,24 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+  Bugfixes:
+    - Uploaded wrong file, oops.
+---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+  Major Features:
+    - Stat modification now allows for infinite depth instead of just 2.
+    - Quality items added by this mod are now converted to their original counterparts when leaving your inventory.
+  Bugfixes:
+    - Fix multiple changes to the same item overwriting each other even if they weren't targeting the same stat.
+    - Fixed Quality items not having recycling recipes.
+---------------------------------------------------------------------------------------------------
+Version: 2.0.6
+  Bugfixes:
+    - Fix Q-picking.
+---------------------------------------------------------------------------------------------------
+Version: 2.0.5
+  Bugfixes:
+    - Fix edge case.
+---------------------------------------------------------------------------------------------------
 Version: 2.0.4
   Bugfixes:
     - Fix wrong name being used for item generation.
