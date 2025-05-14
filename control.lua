@@ -128,8 +128,8 @@ end
 
 ---@param event EventData.on_gui_opened
 local function on_gui_opened(event)
-    entity_gui_open = true
     if event.gui_type ~= 1 then return end
+    entity_gui_open = true
     local inventory = game.get_player(event.player_index).get_main_inventory()
     if not inventory then return end
     for i = 1, #inventory do
@@ -150,8 +150,8 @@ end
 
 ---@param event EventData.on_gui_closed
 local function on_gui_closed(event)
-    entity_gui_open = false
     if event.gui_type ~= 1 then return end
+    entity_gui_open = false
     local inventory = game.get_player(event.player_index).get_main_inventory()
     if not inventory then return end
     for i = 1, #inventory do
@@ -197,8 +197,10 @@ script.on_event(defines.events.on_built_entity, on_built)
 script.on_event(defines.events.on_robot_built_entity, on_built)
 script.on_event(defines.events.script_raised_built, on_built)
 script.on_event(defines.events.script_raised_revive, on_built)
-script.on_event(defines.events.on_player_main_inventory_changed, on_inventory_changed)
-script.on_event(defines.events.on_player_dropped_item, on_player_dropped_item)
-script.on_event(defines.events.on_gui_opened, on_gui_opened)
-script.on_event(defines.events.on_gui_closed, on_gui_closed)
-script.on_event(defines.events.on_player_fast_transferred, on_ctrl_click_transfer)
+if common.config("enable-quality-items").value then
+    script.on_event(defines.events.on_player_main_inventory_changed, on_inventory_changed)
+    script.on_event(defines.events.on_player_dropped_item, on_player_dropped_item)
+    script.on_event(defines.events.on_gui_opened, on_gui_opened)
+    script.on_event(defines.events.on_gui_closed, on_gui_closed)
+    script.on_event(defines.events.on_player_fast_transferred, on_ctrl_click_transfer)
+end

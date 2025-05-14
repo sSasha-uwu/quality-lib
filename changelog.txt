@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+  Major Features:
+    - Added an option to disable the generation of Quality items. This is a trade-off that both fixes and causes issues. It serves as an optional bandaid solution until I can figure out how to fix all of the Quality item related bugs.
+  Bugfixes:
+    - Fixed recycling recipes overwriting themselves.
+    - Blacklisted Factorissimo 3 buildings.
+---------------------------------------------------------------------------------------------------
 Version: 2.1.1
   Bugfixes:
     - Uploaded wrong file, oops.

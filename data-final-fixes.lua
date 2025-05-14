@@ -71,39 +71,41 @@ local function generate_quality_prototypes(
             new_entity.localised_name = { "entity-name." .. new_entity.name }
             new_entity.localised_description = { "entity-description." .. new_entity.name }
             new_entity.name = prefix .. prototype_name
-            --- @type data.ItemPrototype
-            local new_item
-            for data_name, _ in pairs(data.raw) do
-                for _, item_value in pairs(data.raw[data_name]) do
-                    if item_value.place_result and item_value.place_result == prototype_name then
-                        new_item = table.deepcopy(item_value)
-                        goto next
+            if common.config("enable-quality-items").value then
+                --- @type data.ItemPrototype
+                local new_item
+                for data_name, _ in pairs(data.raw) do
+                    for _, item_value in pairs(data.raw[data_name]) do
+                        if item_value.place_result and item_value.place_result == prototype_name then
+                            new_item = table.deepcopy(item_value)
+                            goto next
+                        end
                     end
                 end
-            end
-            ::next::
-            if new_item then
-                if new_entity.minable and new_entity.minable.result == new_item.name then
-                    new_entity.minable.result = tostring(new_entity.name)
-                elseif new_entity.placeable_by then
-                    new_entity.placeable_by.item = tostring(prefix .. new_item.name)
+                ::next::
+                if new_item then
+                    if new_entity.minable and new_entity.minable.result == new_item.name then
+                        new_entity.minable.result = tostring(new_entity.name)
+                    elseif new_entity.placeable_by then
+                        new_entity.placeable_by.item = tostring(prefix .. new_item.name)
+                    else
+                        new_entity.placeable_by = { item = tostring(prefix .. new_item.name), count = 1 }
+                    end
+                    new_item.name = prefix .. new_item.name
+                    new_item.place_result = new_item.name
+                    new_item.subgroup = nil
+                    table.insert(new_prototypes, new_item)
                 else
-                    new_entity.placeable_by = { item = tostring(prefix .. new_item.name), count = 1 }
+                    error("Could not generate item for " .. prototype_name)
                 end
-                new_item.name = prefix .. new_item.name
-                new_item.place_result = new_item.name
-                new_item.subgroup = nil
-                table.insert(new_prototypes, new_item)
-            else
-                error("Could not generate item for " .. prototype_name)
+
+                local new_recycling_recipe = table.deepcopy(data.raw.recipe[prototype_name .. "-recycling"])
+                new_recycling_recipe.name = prefix .. new_recycling_recipe.name
+                new_recycling_recipe.ingredients[1].name = tostring(new_entity.name)
+                table.insert(new_prototypes, new_recycling_recipe)
             end
             alter_stats(new_entity, prototype_value, quality_value)
             table.insert(new_prototypes, new_entity)
-
-            local new_recycling_recipe = table.deepcopy(data.raw.recipe[prototype_name .. "-recycling"])
-            new_recycling_recipe.name = prefix .. new_recycling_recipe.name
-            new_recycling_recipe.ingredients[1].name = tostring(new_entity.name)
-            table.insert(new_prototypes, new_recycling_recipe)
         end
     end
     return new_prototypes
